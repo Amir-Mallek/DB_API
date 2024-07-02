@@ -17,7 +17,7 @@ public class QueryMakerService {
         return String.join(",", columns);
     }
 
-    public String eqFields(List<String> columns) {
+    public String eqFields(Set<String> columns) {
         StringBuilder sb = new StringBuilder();
         for (String column : columns) {
             sb.append(column).append(" = ?,");
@@ -62,16 +62,21 @@ public class QueryMakerService {
         return sb.substring(0, sb.length() - 1);
     }
 
-//    public String updateSql(
-//            String schema,
-//            String table,
-//            List<String> modificationColumns,
-//            List<String> conditionColumns
-//    );
-//
-//    public Pair<String, List<Object>> deleteSql(
-//            String schema,
-//            String table,
-//            List<String> conditionColumns
-//    );
+    public String updateSql(
+            String schema,
+            String table,
+            Set<String> modificationColumns,
+            Set<String> conditionColumns
+    ) {
+        return "UPDATE " + schema + "." + table + " SET " + eqFields(modificationColumns)
+                + whereClause(conditionColumns);
+    }
+
+    public String deleteSql(
+            String schema,
+            String table,
+            Set<String> conditionColumns
+    ) {
+        return "DELETE FROM " + schema + "." + table + whereClause(conditionColumns);
+    }
 }

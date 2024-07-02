@@ -18,22 +18,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/{schema}/{table}")
 public class DbAccessController {
-
     private final QueryMakerService queryMaker;
-
-    private final JdbcTemplate template;
-
     private final QueryExecutionService queryExecutioner;
 
     @Autowired
-    public DbAccessController(
-            QueryMakerService queryMaker,
-            JdbcTemplate template,
-            QueryExecutionService queryExecutioner
-    ) {
-        this.queryMaker = queryMaker;
-        this.template = template;
+    public DbAccessController(QueryExecutionService queryExecutioner, QueryMakerService queryMaker) {
         this.queryExecutioner = queryExecutioner;
+        this.queryMaker = queryMaker;
     }
 
     @GetMapping
@@ -60,8 +51,8 @@ public class DbAccessController {
             @PathVariable String table,
             @Valid @RequestBody UpdateDto updateDto
     ) {
-        System.out.println(updateDto);
-        return "Update query";
+        return queryMaker.updateSql(schema, table, updateDto.getMods().keySet(),
+                updateDto.getWhere()==null?null:updateDto.getWhere().keySet());
     }
 
     @DeleteMapping
