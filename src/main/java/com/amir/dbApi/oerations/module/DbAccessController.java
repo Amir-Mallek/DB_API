@@ -4,8 +4,10 @@ import com.amir.dbApi.oerations.dtos.DeleteDto;
 import com.amir.dbApi.oerations.dtos.InsertDto;
 import com.amir.dbApi.oerations.dtos.SelectDto;
 import com.amir.dbApi.oerations.dtos.UpdateDto;
+import com.amir.dbApi.oerations.response.DeleteResponse;
 import com.amir.dbApi.oerations.response.InsertResponse;
 import com.amir.dbApi.oerations.response.SelectResponse;
+import com.amir.dbApi.oerations.response.UpdateResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,13 +20,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/{schema}/{table}")
 public class DbAccessController {
-    private final QueryMakerService queryMaker;
+
     private final QueryExecutionService queryExecutioner;
 
     @Autowired
-    public DbAccessController(QueryExecutionService queryExecutioner, QueryMakerService queryMaker) {
+    public DbAccessController(QueryExecutionService queryExecutioner) {
         this.queryExecutioner = queryExecutioner;
-        this.queryMaker = queryMaker;
     }
 
     @GetMapping
@@ -46,22 +47,20 @@ public class DbAccessController {
     }
 
     @PutMapping
-    public String updateQuery(
+    public UpdateResponse updateQuery(
             @PathVariable String schema,
             @PathVariable String table,
             @Valid @RequestBody UpdateDto updateDto
     ) {
-        return queryMaker.updateSql(schema, table, updateDto.getMods().keySet(),
-                updateDto.getWhere()==null?null:updateDto.getWhere().keySet());
+        return queryExecutioner.update(schema, table, updateDto);
     }
 
     @DeleteMapping
-    public String deleteQuery(
+    public DeleteResponse deleteQuery(
             @PathVariable String schema,
             @PathVariable String table,
             @Valid @RequestBody DeleteDto deleteDto
     ) {
-        System.out.println(deleteDto);
-        return "Delete query";
+        return queryExecutioner.remove(schema, table, deleteDto);
     }
 }

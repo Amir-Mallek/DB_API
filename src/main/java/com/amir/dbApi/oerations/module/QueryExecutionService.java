@@ -1,9 +1,13 @@
 package com.amir.dbApi.oerations.module;
 
+import com.amir.dbApi.oerations.dtos.DeleteDto;
 import com.amir.dbApi.oerations.dtos.InsertDto;
 import com.amir.dbApi.oerations.dtos.SelectDto;
+import com.amir.dbApi.oerations.dtos.UpdateDto;
+import com.amir.dbApi.oerations.response.DeleteResponse;
 import com.amir.dbApi.oerations.response.InsertResponse;
 import com.amir.dbApi.oerations.response.SelectResponse;
+import com.amir.dbApi.oerations.response.UpdateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -43,7 +47,7 @@ public class QueryExecutionService {
                     : template.queryForList(sql, selectDto.getWhere().values().toArray());
             return new SelectResponse(data);
         } catch (Exception e) {
-            return new SelectResponse(e.getMessage());
+            return new SelectResponse(e.getCause().getMessage());
         }
     }
 
@@ -68,7 +72,50 @@ public class QueryExecutionService {
             int affectedRows = template.update(sql, args.toArray());
             return new InsertResponse(affectedRows);
         } catch (Exception e) {
-            return new InsertResponse(e.getMessage());
+            return new InsertResponse(e.getCause().getMessage());
+        }
+    }
+
+    public UpdateResponse update(
+            String schema,
+            String table,
+            UpdateDto updateDto
+    ) {
+        String sql = queryMaker.updateSql(
+                schema,
+                table,
+                updateDto.getMods().keySet(),
+                (updateDto.getWhere() == null) ? null : updateDto.getWhere().keySet()
+        );
+        List<Object> args = new ArrayList<>(updateDto.getMods().values());
+        if (updateDto.getWhere() != null) {
+            args.addAll(updateDto.getWhere().values());
+        }
+        try {
+            int affectedRows = template.update(sql, args.toArray());
+            return new UpdateResponse(affectedRows);
+        } catch (Exception e) {
+            return new UpdateResponse(e.getCause().getMessage());
+        }
+    }
+
+    public DeleteResponse remove(
+            String schema,
+            String table,
+            DeleteDto deleteDto
+    ) {
+        String sql = queryMaker.deleteSql(
+                schema,
+                table,
+                (deleteDto.getWhere() == null) ? null : deleteDto.getWhere().keySet()
+        );
+        try {
+            int affectedRows = (deleteDto.getWhere() == null)
+                    ? template.update(sql)
+                    : template.update(sql, deleteDto.getWhere().values().toArray());
+            return new DeleteResponse(affectedRows);
+        } catch (Exception e) {
+            return new DeleteResponse(e.getCause().getMessage());
         }
     }
 
