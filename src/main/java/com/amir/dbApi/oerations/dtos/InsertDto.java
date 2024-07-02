@@ -1,16 +1,28 @@
 package com.amir.dbApi.oerations.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Map;
 
+@ValidInsertDto
 public class InsertDto {
+
+    @NotNull(message = "You must columns of the new rows.")
     private List<String> cols;
+
+    @NotNull(message = "You must provide at least one row.")
     private List<Map<String, Object>> values;
+
     private Map<String, Object> where;
 
     public InsertDto() {}
 
-    public InsertDto(List<String> cols, List<Map<String, Object>> values, Map<String, Object> where) {
+    public InsertDto(
+            List<String> cols,
+            List<Map<String, Object>> values,
+            Map<String, Object> where
+    ) {
         this.cols = cols;
         this.values = values;
         this.where = where;

@@ -1,8 +1,11 @@
 package com.amir.dbApi.oerations.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Map;
 
 public class DeleteDto {
+
     private Map<String, Object> where;
 
     public DeleteDto() {}

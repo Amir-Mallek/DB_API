@@ -1,10 +1,15 @@
 package com.amir.dbApi.oerations.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 import java.util.Map;
 
 public class SelectDto {
+
+    @NotNull(message = "You must specify at least one column.")
     private List<String> cols;
+
     private Map<String, Object> where;
 
     public SelectDto() {}

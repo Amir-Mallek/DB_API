@@ -1,9 +1,14 @@
 package com.amir.dbApi.oerations.dtos;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.util.Map;
 
 public class UpdateDto {
+
+    @NotNull(message = "You must modify at least one column.")
     private Map<String, Object> mods;
+
     private Map<String, Object> where;
 
     public UpdateDto() {}
